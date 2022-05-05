@@ -1,0 +1,48 @@
+#!/usr/bin/python
+import requests
+import time
+import json
+
+print ('Please enter a hash')
+
+hash = input()
+
+#test if hash is valid
+if len(hash) != 64 and len(hash) != 32:
+        print('The hash is invalid')
+        quit()
+
+print('Please enter your API key')
+
+api_key = input()
+
+if api_key == "":
+        print('You need to enter an API key to run this program')
+        quit()
+
+#send request
+url = "https://www.virustotal.com/api/v3/files/" + hash
+
+headers = {
+    "Accept": "application/json",
+    "x-apikey": api_key
+}
+
+response = requests.get(url, headers=headers)
+#receive info
+
+print(response.status_code)
+if response.status_code != 200:
+        print('Your API call failed')
+        quit()
+
+# compare av engine detections
+response_json = json.loads(response.content)
+
+if response_json['malicious'] == 0:
+        print('The file is clean')
+elif response_json['malicious'] >= 5:
+        print(response_json['malicious'])
+else:
+        print('The file may be malicious')
+        print(response_json['malicious'])
